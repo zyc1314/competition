@@ -95,43 +95,13 @@ class UserRoundData(object):
 
         self.n_users = len(_user_datasets)
 
-    def round_data(self, user_idx, n_round, n_round_samples=-1):
+    def round_data(self, user_idx):
         """Generate data for user of user_idx at round n_round.
 
         Args:
             user_idx: int,  in [0, self.n_users)
-            n_round: int, round number
         """
-        if n_round_samples == -1:
-            return self._user_datasets[user_idx]
-
-        n_samples = len(self._user_datasets[user_idx][1])
-        choices = np.random.choice(n_samples, min(n_samples, n_round_samples))
-
-        return self._user_datasets[user_idx][0][choices], self._user_datasets[
-            user_idx][1][choices]
-
-    def uniform_random_loader(self, n_samples, batch_size=1000):
-        X, Y = [], []
-        n_samples_each_user = n_samples // len(self._user_datasets)
-        if n_samples_each_user <= 0:
-            n_samples_each_user = 1
-
-        for idx in range(len(self._user_datasets)):
-            x, y = self.round_data(user_idx=idx,
-                                   n_round=0,
-                                   n_round_samples=n_samples_each_user)
-            X.append(x)
-            Y.append(y)
-
-        data = CompDataset(X=np.concatenate(X), Y=np.concatenate(Y))
-        train_loader = torch.utils.data.DataLoader(
-            data,
-            batch_size=min(batch_size, n_samples),
-            shuffle=True,
-        )
-
-        return train_loader
+        return self._user_datasets[user_idx]
 
 
 def get_test_loader(batch_size=1000):
